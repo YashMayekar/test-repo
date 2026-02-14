@@ -1,6 +1,8 @@
 import numpy as np
 from functools import lru_cache
 import time
+from collections import defaultdict, deque
+import heapq
 
 def generate_random_data(size=50000000):
     """Generate large random dataset using NumPy for efficiency"""
@@ -49,9 +51,162 @@ def fibonacci(n=35):
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+# DSA: Graph algorithms
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+        self.vertices = set()
+    
+    def add_edge(self, u, v, weight=1):
+        self.graph[u].append((v, weight))
+        self.vertices.add(u)
+        self.vertices.add(v)
+    
+    def dijkstra(self, start):
+        """Dijkstra's shortest path algorithm"""
+        distances = {v: float('inf') for v in self.vertices}
+        distances[start] = 0
+        pq = [(0, start)]
+        
+        while pq:
+            current_dist, u = heapq.heappop(pq)
+            if current_dist > distances[u]:
+                continue
+            for v, weight in self.graph[u]:
+                if distances[u] + weight < distances[v]:
+                    distances[v] = distances[u] + weight
+                    heapq.heappush(pq, (distances[v], v))
+        return distances
+    
+    def bfs(self, start):
+        """Breadth-first search"""
+        visited = set()
+        queue = deque([start])
+        visited.add(start)
+        result = []
+        
+        while queue:
+            u = queue.popleft()
+            result.append(u)
+            for v, _ in self.graph[u]:
+                if v not in visited:
+                    visited.add(v)
+                    queue.append(v)
+        return result
+
+# DSA: Binary Search Tree
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
+class BST:
+    def __init__(self):
+        self.root = None
+    
+    def insert(self, val):
+        if not self.root:
+            self.root = TreeNode(val)
+        else:
+            self._insert_recursive(self.root, val)
+    
+    def _insert_recursive(self, node, val):
+        if val < node.val:
+            if node.left is None:
+                node.left = TreeNode(val)
+            else:
+                self._insert_recursive(node.left, val)
+        else:
+            if node.right is None:
+                node.right = TreeNode(val)
+            else:
+                self._insert_recursive(node.right, val)
+    
+    def inorder_traversal(self):
+        result = []
+        self._inorder(self.root, result)
+        return result
+    
+    def _inorder(self, node, result):
+        if node:
+            self._inorder(node.left, result)
+            result.append(node.val)
+            self._inorder(node.right, result)
+
+# DSA: Sorting algorithms
+def merge_sort(arr):
+    """Merge sort algorithm"""
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+def quick_sort(arr):
+    """Quick sort algorithm"""
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + middle + quick_sort(right)
+
+# DSA: Dynamic Programming
+@lru_cache(maxsize=None)
+def longest_increasing_subsequence_length(arr, n, prev=-1):
+    """LIS using DP"""
+    if n == 0:
+        return 0
+    incl = 0
+    if prev == -1 or arr[n-1] > arr[prev]:
+        incl = 1 + longest_increasing_subsequence_length(arr, n-1, n-1)
+    excl = longest_increasing_subsequence_length(arr, n-1, prev)
+    return max(incl, excl)
+
+@lru_cache(maxsize=None)
+def edit_distance(s1, s2, m, n):
+    """Edit distance (Levenshtein) using DP"""
+    if m == 0:
+        return n
+    if n == 0:
+        return m
+    if s1[m-1] == s2[n-1]:
+        return edit_distance(s1, s2, m-1, n-1)
+    return 1 + min(
+        edit_distance(s1, s2, m-1, n),
+        edit_distance(s1, s2, m, n-1),
+        edit_distance(s1, s2, m-1, n-1)
+    )
+
+# DSA: Hash Map operations
+def frequency_counter(arr):
+    """Count frequency using hash map"""
+    freq = defaultdict(int)
+    for num in arr:
+        freq[num] += 1
+    return freq
+
 if __name__ == "__main__":
     start_time = time.time()
     
+    print("=== NumPy Operations ===")
     print("Generating random data...")
     data = generate_random_data(50000000)
     
@@ -67,21 +222,36 @@ if __name__ == "__main__":
     rank = matrix_operations(500)
     print(f"Matrix rank: {rank}")
     
-    print("Matrix multiplication...")
-    product = matrix_multiplication(1500)
-    print(f"Multiplication result shape: {product.shape}")
-    
     print("Eigenvalue decomposition...")
     eig_sum = eigenvalue_decomposition(1500)
     print(f"Eigenvalue sum: {eig_sum:.2f}")
     
-    print("Recursive calculation...")
-    fac = recursive_function(50)
-    print(f"Factorial result: {fac}")
+    print("\n=== DSA: Graph ===")
+    g = Graph()
+    for i in range(100):
+        g.add_edge(i, (i+1) % 100, np.random.randint(1, 10))
+    distances = g.dijkstra(0)
+    print(f"Dijkstra distances from 0: {len(distances)} vertices")
     
-    print("Fibonacci calculation...")
+    print("\n=== DSA: BST ===")
+    bst = BST()
+    for _ in range(1000):
+        bst.insert(np.random.randint(1, 10000))
+    print(f"BST inorder (first 10): {bst.inorder_traversal()[:10]}")
+    
+    print("\n=== DSA: Sorting ===")
+    test_arr = list(np.random.randint(0, 1000, 5000))
+    sorted_merge = merge_sort(test_arr[:100])
+    sorted_quick = quick_sort(test_arr[:100])
+    print(f"Merge sort result (first 10): {sorted_merge[:10]}")
+    
+    print("\n=== DSA: Dynamic Programming ===")
     fib = fibonacci(35)
-    print(f"Fibonacci result: {fib}")
+    print(f"Fibonacci(35): {fib}")
+    
+    print("\n=== DSA: Hash Map ===")
+    freq = frequency_counter(test_arr[:1000])
+    print(f"Unique elements: {len(freq)}")
     
     elapsed = time.time() - start_time
     print(f"\nTotal execution time: {elapsed:.2f}s")
