@@ -56,4 +56,3 @@ class Pipeline:
 if __name__ == "__main__":
     pipeline = Pipeline()
     pipeline.register_processor("json", JSONProcessor())
-    print(pipeline.execute("csv", "sample.csv"))
