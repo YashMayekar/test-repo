@@ -33,8 +33,6 @@ class DataAnalyzer:
     
     def get_summary(self) -> Dict:
         return {
-            "total_records": len(self.data),
-            "processed_at": self.timestamp.isoformat(),
             "keys": list(self.data[0].keys()) if self.data else []
         }
     
