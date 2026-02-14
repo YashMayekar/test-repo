@@ -2,6 +2,7 @@ import random
 import math
 from datetime import datetime
 from collections import defaultdict
+from typing import List, Dict, Any
 
 # Generate random data structures
 data_dict = {f"key_{i}": random.randint(1, 1000) for i in range(100)}
