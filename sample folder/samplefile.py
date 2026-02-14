@@ -12,26 +12,43 @@ class DataProcessor:
     def __init__(self):
         self.cache = defaultdict(list)
         self.timestamp = datetime.now()
+        self.processed_count = 0
     
     def process_numbers(self, numbers):
+        self.processed_count += len(numbers)
         return [x ** 2 for x in numbers]
     
     def calculate_stats(self, data):
+        if not data:
+            return {}
         return {
             'mean': sum(data) / len(data),
             'max': max(data),
             'min': min(data),
-            'sum': sum(data)
+            'median': sorted(data)[len(data)//2],
+            'sum': sum(data),
+            'count': len(data)
         }
+    
+    def filter_outliers(self, data, threshold=2):
+        stats = self.calculate_stats(data)
+        mean = stats['mean']
+        return [x for x in data if abs(x - mean) <= threshold * stats['max']]
 
 processor = DataProcessor()
 results = processor.process_numbers(data_list)
 stats = processor.calculate_stats(results)
+filtered_results = processor.filter_outliers(results)
 
-# Generate some mathematical calculations
+# Generate mathematical calculations
 values = [math.sqrt(i) for i in range(1, 101)]
 products = [math.factorial(i) for i in range(1, 11)]
+logarithms = [math.log(i) for i in range(1, 51)]
 
+# Additional analysis
 print(f"Data dict length: {len(data_dict)}")
-print(f"Results: {stats}")
+print(f"Statistics: {stats}")
 print(f"Processed values count: {len(values)}")
+print(f"Filtered results: {len(filtered_results)}")
+print(f"Total processed: {processor.processed_count}")
+print(f"Timestamp: {processor.timestamp}")
