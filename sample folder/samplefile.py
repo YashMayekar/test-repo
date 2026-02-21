@@ -57,5 +57,3 @@ if __name__ == "__main__":
     pipeline = Pipeline()
 # Register processors
     pipeline.register_processor("csv", CSVProcessor())
-
-# LOVE YOUUU
